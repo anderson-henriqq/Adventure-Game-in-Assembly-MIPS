@@ -32,15 +32,24 @@ pintarPlayer1:
 	addi $19, $0, 0x6ABE8  # Deslocamento total em hexadecimal
         addu $20, $20, $19     # Adiciona o deslocamento ao endereço base, guardando o resultado em $20
 	addi $8, $0, 13
+	addi $8, $0, 13
 	addi $25, $0, 0xffffff #adiciona cor vermelha ao registrador 25
-	jal pintarPlayer2
+	jal pintarPlayerL
 
-pintarPlayer2:
-	beq $8, $0, fimN
+pintarPlayerC:
+	beq $9, $0, fimN 
+	addi $19, $0, 0x7CC  # Deslocamento total em hexadecimal
+        addu $20, $20, $19   
+	addi $8, $0, 13
+	addi $9, $9, -1
+	jal pintarPlayerL
+
+pintarPlayerL:
+	beq $8, $0, pintarPlayerC  
 	sw $25, 0($20)
 	addi $20, $20, 4
 	add $8, $8, -1
-	jal pintarPlayer2
+	jal pintarPlayerL
 	
 reset:
 	jr $31
