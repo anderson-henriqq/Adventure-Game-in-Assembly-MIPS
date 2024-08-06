@@ -8,73 +8,70 @@
 
 main:
 	jal backups
-	jal pintarF1 #Pinta o cenário da fase 1
-	#jal LocInicial # Inicia as cordenadas para pintar o player
-	#jal pintarPlayer1
-	#jal fiml
+	jal pintarF1 #Pinta o cenÃ¡rio da fase 1
+	jal LocInicial # Inicia as cordenadas para pintar o player
+	jal pintarPlayer1
+	jal fiml
 		
 backups:
-	lui $20, 0x1001 
-	lui $21, 0x1002 
+	lui $20, 0x1001  
 	addi $8, $0, 32768
 	j backup1
 
 backup1:
 	beq $8, $0, reset	
 	lw $4, 0($20)	
-	sw $4, 0($21)
-	addi $20,$20,4
-	addi $21,$21,4
+	sw $4, 0($20)
+	sw $4, 131072($20)
+	addi $20,$20, 4
 	addi $8,$8,-1
 	j backup1
 
 pintarF1:
 	lui $20, 0x1001 #Carrega o endereco base do display no registrador $20
-	lui $21, 0x1002
 	addi $8, $0, 32768 #Carrega a quantidadede pixels queo video tem 256x128
 	j pintarF11
 
 pintarF11:
 	beq $8, $0, reset	
-	lw $4, 0($21)	
+	lw $4, 131072($20)	
 	sw $4, 0($20)
 	addi $20, $20,4
-	addi $21, $21,4
 	addi $8,$8,-1
 	j pintarF11
 
 LocInicial:
-	lui $20, 0x1001
-	ori $20, $20, 0x0000  # Carrega a parte inferior do endereço base (completa o endereço 0x10010000)
+	lui $21, 0x1001
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃ§o base (completa o endereÃ§o 0x10010000)
 	addi $19, $0, 0x19DF4  # Deslocamento total em hexadecimal
-        addu $20, $20, $19     # Adiciona o deslocamento ao endereço base, guardando o resultado em $20
+        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃ§o base, guardando o resultado em $20
 	j reset
 pintarPlayer1:
-	addi $8, $0, 6 #Número de colunas do player
-	addi $9, $0, 6 #Número de linhas do player
+	addi $8, $0, 6 #NÃºmero de colunas do player
+	addi $9, $0, 6 #NÃºmero de linhas do player
 	addi $25, $0, 0xffffff #adiciona cor branca ao registrador 25
 	j pintarPlayerL
 
 pintarPlayerC:
 	beq $9, $0, reset 
 	addi $19, $0, 0x3E8  # adiciona 250px em hexadecimal
-        addu $20, $20, $19   # desloca 250px ou 1000 bytes a frente
+        addu $21, $21, $19   # desloca 250px ou 1000 bytes a frente
 	addi $8, $0, 6 	
 	addi $9, $9, -1 # Decrementa o contador de colunas
 	j pintarPlayerL
 
 pintarPlayerL:
 	beq $8, $0, pintarPlayerC  
-	sw $25, 0($20)
-	addi $20, $20, 4
+	sw $25, 0($21)
+	addi $21, $21, 4
 	add $8, $8, -1
 	j pintarPlayerL
 
 fiml:  
-	lui $20, 0x1001
-	ori $20, $20, 0x0000  # Carrega a parte inferior do endereço base (completa o endereço 0x10010000)
+	lui $21, 0x1001
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃ§o base (completa o endereÃ§o 0x10010000)
 	addi $19, $0, 0x19DF4  # Deslocamento total em hexadecimal
-	addu $20, $20, $19     # Adiciona o deslocamento ao endereço base, guardando o resultado em $20
+	addu $21, $21, $19     # Adiciona o deslocamento ao endereÃ§o base, guardando o resultado em $20
 	lui $26, 0xffff
         addi $11, $0, ' '
         addi $12, $0, 'a'
@@ -94,30 +91,36 @@ lacoP: lw $10, 0($26)
        j NaoDig                                          
 
 DigA:  
-       addi $20, $20, -4
-       addi $21, $20, 0
-       
-       jal pintarPlayer1
+       addi $21, $21, -12
+       jal pintarF1
        addi $20, $21, 0
+       jal pintarPlayer1
+       addi $21, $20, 0 
        j NaoDig                                                                      
 
-DigD:  lw $17, 0x0800($20)
-       sw $17, 0($20)
-       addi $20, $20, +4
-       sw $25, 0($20)
+DigD:  
+       addi $21, $21, 12
+       jal pintarF1
+       addi $20, $21, 0
+       jal pintarPlayer1
+       addi $21, $20, 0 
        j NaoDig
 
-DigS:  lw $17, 0x0800($20)
-       sw $17, 0($20)
-       addi $20, $20, +128
-       sw $25, 0($20)
+DigS:  
+       addi $21, $21, +3072
+       jal pintarF1
+       addi $20, $21, 0
+       jal pintarPlayer1
+       addi $21, $20, 0 
        j NaoDig      
 
-DigW:  lw $17, 0x0800($20)
-       sw $17, 0($20)
-       addi $20, $20, -128
-       sw $25, 0($20)
-       j NaoDig                                                                                                  
+DigW:  
+       addi $21, $21, -3072
+       jal pintarF1
+       addi $20, $21, 0
+       jal pintarPlayer1
+       addi $21, $20, 0 
+       j NaoDig                                                                                       
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 NaoDig: j lacoP                                                      		
 						
