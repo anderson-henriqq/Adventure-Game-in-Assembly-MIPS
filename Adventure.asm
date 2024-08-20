@@ -100,6 +100,10 @@ CheckColisaoCenario:
 	bne $4, 0xaaaaaa, ColisaoCenario
 	lw $4 24($21)
 	bne $4, 0xaaaaaa, ColisaoCenario
+	lw $4 4096($21)
+	bne $4, 0xaaaaaa, ColisaoCenario
+	lw $4 4120($21)
+	bne $4, 0xaaaaaa, ColisaoCenario
 	j reset
 ColisaoCenario:
 	add $21, $21, $5
@@ -117,34 +121,37 @@ DigA:
  
 DigD:  
        addi $21, $21, 12
-       jal pintarF1
+       addi $5, $0, -12 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
+       jal pintarF1 #Pinta o cenario
+       jal CheckColisaoCenario
        addi $20, $21, 0
        jal pintarPlayer1
        addi $21, $20, 0 
-       j NaoDig
+       j NaoDig         
 
 DigS:  
        addi $21, $21, +3072
-       jal pintarF1
+       addi $5, $0, -3072 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
+       jal pintarF1 #Pinta o cenario
+       jal CheckColisaoCenario
        addi $20, $21, 0
        jal pintarPlayer1
        addi $21, $20, 0 
-       j NaoDig      
+       j NaoDig          
 
 DigW:  
        addi $21, $21, -3072
        addi $5, $0, +3072 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
+       jal pintarF1 #Pinta o cenario
        jal CheckColisaoCenario
-       jal pintarF1
        addi $20, $21, 0
        jal pintarPlayer1
        addi $21, $20, 0 
-       j NaoDig                                                                                       
+       j NaoDig                                                                                    
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 NaoDig: j lacoP                                                      		
 						
-reset:
-	jr $31
+reset: jr $31
 
 fimN: addi $2, $0, 10
       syscall
