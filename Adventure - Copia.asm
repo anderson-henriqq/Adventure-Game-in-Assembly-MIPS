@@ -12,9 +12,12 @@
 
 .text
 
+# Registrador $27 est� reservado para guardar endere�o de retorno apos chamada de funcoes sem o jal
+# Registrador $28 est� reservada como controle de cenario
+
 main:
-	jal test #ajuste de cores do cenario
-	jal test1
+	jal test # Imagem do cenario foi pixealizado com erro e alguma cores foram trocadas, essa fun��o corrige a cores de pixels.
+	jal test1 # Cria uma demarcacao de cor 0xb1b1b1 para controlar a troca de cenario
 	jal backups #Pinta o cenario 1 apenas uma vez e salva uma copia do cenario 131072 bytes a frente do endereÃ§o 0x1001
 	jal pintarF1 #Pinta o cenÃƒÂ¡rio da fase 1
 	jal LocInicial # Inicia as cordenadas para pintar o player
@@ -72,10 +75,14 @@ backup1:
 	addi $20,$20, 4
 	addi $8,$8,-1
 	j backup1
+pintarFase:
+	beq $28, 1, pintarF1
+	beq $28, -1, pintarF2
 
 pintarF1:
 	lui $20, 0x1001 #Carrega o endereco base do display no registrador $20
 	addi $8, $0, 8192 #Carrega a quantidadede pixels queo video tem 256x128
+	addi $28, $0, 1 #controle de cenario / Registrador $28 armazena 1 quando est� no cenario 1 e -1 quando est� no 2
 	j pintarF11
 
 pintarF11:
@@ -86,17 +93,10 @@ pintarF11:
 	addi $8,$8,-1
 	j pintarF11
 
-
-caso2:
-	jal pintarF2
-	jal LocIniciaF2
-	addi $20, $21, 0
-       	jal pintarPlayer1
-       	addi $21, $20, 0  
-	j NaoDig  
 pintarF2:
 	lui $20, 0x1001 #Carrega o endereco base do display no registrador $20
 	addi $8, $0, 8192 #Carrega a quantidadede pixels queo video tem 256x128
+	addi $28, $0, -1 #controle de cenario / Registrador $28 armazena 1 quando est� no cenario 1 e -1 quando est� no 2
 	j pintarF22
 
 pintarF22:
@@ -114,7 +114,12 @@ LocInicial:
 	addi $19, $0, 0x66F8  # Deslocamento total em hexadecimal
         addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÂ§o base, guardando o resultado em $20
 	j reset
-	
+LocInicialF1:
+	lui $21, 0x1001
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÂ§o base (completa o endereÃƒÂ§o 0x10010000)
+	addi $19, $0, 0x7B00  # Deslocamento total em hexadecimal
+        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÂ§o base, guardando o resultado em $20
+	j reset		
 LocIniciaF2:
 	lui $21, 0x1001
 	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÂ§o base (completa o endereÃƒÂ§o 0x10010000)
@@ -142,7 +147,25 @@ pintarPlayerL:
 	addi $21, $21, 4
 	add $8, $8, -1
 	j pintarPlayerL
-
+	
+ColisaoFase:
+	beq $28, 1, controleFase1
+	beq $28, -1, controleFase2
+  
+controleFase1:
+	jal pintarF2
+	jal LocIniciaF2
+	addi $20, $21, 0
+       	jal pintarPlayer1
+       	addi $21, $20, 0  
+	j NaoDig  
+controleFase2:
+	jal pintarF1
+	jal LocInicialF1
+	addi $20, $21, 0
+       	jal pintarPlayer1
+       	addi $21, $20, 0  
+	j NaoDig
 fiml:  
 	lui $21, 0x1001
 	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÂ§o base (completa o endereÃƒÂ§o 0x10010000)
@@ -168,13 +191,21 @@ lacoP: lw $10, 0($26)
 
 
 CheckColisaoCenario:
+	#Vertice 1 do player
 	lw $4 0($21)
+	beq $4, 0xb1b1b1, ColisaoFase
 	bne $4, 0xaaaaaa, ColisaoCenario
+	
+	#Vertice 2 do player
 	lw $4 8($21)
 	bne $4, 0xaaaaaa, ColisaoCenario
+	
+	#Vertice 3 do player
 	lw $4 1024($21)
-	beq $4, 0xb1b1b1, caso2
+	beq $4, 0xb1b1b1, ColisaoFase
 	bne $4, 0xaaaaaa, ColisaoCenario
+	
+	#Vertice 4 do player
 	lw $4 1032($21)
 	bne $4, 0xaaaaaa, ColisaoCenario
 	j reset
@@ -186,42 +217,42 @@ ColisaoCenario:
 DigA:  
        addi $21, $21, -4 # decrementa 3 espaÃ§os de memoria do registrador que armazena um ponteiro para a posiÃ§Ã£o inicia do personagem
        addi $5, $0, +4 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarF1 #Pinta o cenario
-       jal CheckColisaoCenario
-       addi $20, $21, 0
+       jal pintarFase #Pinta o cenario
+       jal CheckColisaoCenario #Checa se ha alguma coisao
+       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endere�o
        jal pintarPlayer1
-       addi $21, $20, 0 
+       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
        j NaoDig                                                                      
  
 DigD:  
        addi $21, $21, 4
        addi $5, $0, -4 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarF1 #Pinta o cenario
-       jal CheckColisaoCenario
-       addi $20, $21, 0
+       jal pintarFase #Pinta o cenario
+       jal CheckColisaoCenario #Checa se ha alguma coisao
+       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endere�o
        jal pintarPlayer1
-       addi $21, $20, 0 
-       j NaoDig         
+       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
+       j NaoDig        
 
 DigS:  
        addi $21, $21, +512
        addi $5, $0, -512 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarF1 #Pinta o cenario
-       jal CheckColisaoCenario
-       addi $20, $21, 0
+       jal pintarFase #Pinta o cenario
+       jal CheckColisaoCenario #Checa se ha alguma coisao
+       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endere�o
        jal pintarPlayer1
-       addi $21, $20, 0 
-       j NaoDig          
+       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
+       j NaoDig      
 
 DigW:  
        addi $21, $21, -512
        addi $5, $0, +512 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarF1 #Pinta o cenario
-       jal CheckColisaoCenario
-       addi $20, $21, 0
+       jal pintarFase #Pinta o cenario
+       jal CheckColisaoCenario #Checa se ha alguma coisao
+       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endere�o
        jal pintarPlayer1
-       addi $21, $20, 0 
-       j NaoDig                                                                                    
+       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
+       j NaoDig                                                                                      
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 NaoDig: j lacoP                                                      		
 						
