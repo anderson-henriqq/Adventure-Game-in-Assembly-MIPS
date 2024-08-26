@@ -149,9 +149,10 @@ LocIniciaF2:
 	j reset
 LocInicialDrag1:
 	lui $22, 0x1001
-	addi $19, $0, 19060  # Deslocamento 19060 bytes em hexadecimal
+	ori $22, $22, 0x0000
+	addi $19, $0, 0x4A74  # Deslocamento 19060 bytes em hexadecimal
         addu $22, $22, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã‚Â§o base, guardando o resultado em $20
-	addi $29, $0, -512
+        addi $29, $0, -1024
 	j reset
 		
 
@@ -159,25 +160,27 @@ pintarPlayer1:
 	addi $8, $0, 3 #NÃƒÆ’Ã‚Âºmero de linhas do player
 	addi $9, $0, 2 #NÃƒÆ’Ã‚Âºmero de colunas do player
 	addi $25, $0, 0xffffff #adiciona cor branca ao registrador 25
+	add  $18, $21, $0
 	j pintarPlayerL
 
 pintarPlayerC:
 	beq $9, $0, reset 
 	addi $19, $0, 500  # adiciona 126px 
-        addu $21, $21, $19   # desloca 126px ou 496 bytes a frente
+        addu $18, $18, $19   # desloca 126px ou 496 bytes a frente
 	addi $8, $0, 3 	
 	addi $9, $9, -1 # Decrementa o contador de colunas
 	j pintarPlayerL
 	
 pintarPlayerL:
 	beq $8, $0, pintarPlayerC  
-	sw $25, 0($21)
-	addi $21, $21, 4
+	sw $25, 0($18)
+	addi $18, $18, 4
 	add $8, $8, -1
 	j pintarPlayerL
 
 pintarDrag1:
 	lui $20, 0x1001
+	add $18, $22, $0
 	addi $8, $0, 7 #NÃƒÆ’Ã‚Âºmero de linhas do player
 	addi $9, $0, 14 #NÃƒÆ’Ã‚Âºmero de colunas do player
 	j pintarDrag1L
@@ -185,7 +188,7 @@ pintarDrag1:
 pintarDrag1C:
 	beq $9, $0, reset 
 	addi $19, $0, 484  # adiciona 126px 
-        addu $22, $22, $19   # desloca 126px ou 496 bytes a frente
+        addu $18, $18, $19   # desloca 126px ou 496 bytes a frente
 	addi $8, $0, 7 	
 	addi $9, $9, -1 # Decrementa o contador de colunas
 	j pintarDrag1L
@@ -193,20 +196,23 @@ pintarDrag1C:
 pintarDrag1L:
 	beq $8, $0, pintarDrag1C  
 	lw $4, 98304($20)
-	sw $4, 0($22)
+	sw $4, 0($18)
 	addi $20, $20, 4
-	addi $22, $22, 4
+	addi $18, $18, 4
 	add $8, $8, -1
 	j pintarDrag1L
 	
 movimentarDrag:
+	addi $27, $31, 0
+	beq $28, -1, movimentarDrag1
+	jr $27
+movimentarDrag1:
 	add $22, $22, $29
 	jal CheckColisaoDragCenario
 	jal pintarFase
-	addi $20, $22, 0
 	jal pintarDrag1
-	addi $22, $20, 0
-	j NaoDig 
+	jal pintarPlayer1
+	jr $27
 
 CheckColisaoDragCenario:
 	lw $4, 0($22)
@@ -217,22 +223,21 @@ CheckColisaoDragCenario:
 	
 	j reset
 ColisaoDragCenarioSuperior:
-	addi $29, $0, 512
+	addi $29, $0, 1024
 	add  $22, $22, $29 
 	j reset	
 ColisaoDragCenarioInferior:	
-	addi $29, $0, -512
+	addi $29, $0, -1024
 	add  $22, $22, $29 
-	j reset										
+	j reset				
+							
 ColisaoFase:
 	beq $28, 1, controleFase1
 	beq $28, -1, controleFase2
   
 controleFase1:
 	jal pintarF2
-	addi $20, $22, 0
 	jal pintarDrag1
-	addi $22, $20, 0
 	jal LocIniciaF2
 	addi $20, $21, 0
        	jal pintarPlayer1
@@ -259,7 +264,8 @@ fiml:
        
        
 lacoP: lw $10, 0($26)
-       beq $28, -1, movimentarDrag 
+       #beq $28, -1, movimentarDrag
+       jal movimentarDrag
        beq $10, $0, NaoDig      
        lw $16, 4($26)
        beq $16, $11, fimN
@@ -269,7 +275,15 @@ lacoP: lw $10, 0($26)
        beq $16, $15, DigW                    
        j NaoDig                                          
 
-
+posSegundoBeq:
+       beq $10, $0, NaoDig      
+       lw $16, 4($26)
+       beq $16, $11, fimN
+       beq $16, $12, DigA
+       beq $16, $13, DigS
+       beq $16, $14, DigD
+       beq $16, $15, DigW
+       j NaoDig 
 CheckColisaoCenario:
 	#Vertice 1 do player
 	lw $4 0($21)
@@ -299,10 +313,7 @@ DigA:
        addi $5, $0, +4 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
-       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endereço
        jal pintarPlayer1
-       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
-      
        j NaoDig                                                                      
  
 DigD:  
@@ -310,9 +321,7 @@ DigD:
        addi $5, $0, -4 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
-       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endereço
        jal pintarPlayer1
-       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
        j NaoDig        
 
 DigS:  
@@ -320,9 +329,9 @@ DigS:
        addi $5, $0, -512 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
-       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endereço
        jal pintarPlayer1
-       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
+       #add $22, $22, $29
+       #jal movimentarDrag
        j NaoDig      
 
 DigW:  
@@ -330,9 +339,7 @@ DigW:
        addi $5, $0, +512 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
-       addi $20, $21, 0 #Salva a o endereco de memoria da localizacao do player pois a funcao de pintar o player manipula o esse endereço
        jal pintarPlayer1
-       addi $21, $20, 0  #Retoma a o endereco de memoria real da localizacao do player
        j NaoDig                                                                                      
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 NaoDig: j lacoP                                                      		
