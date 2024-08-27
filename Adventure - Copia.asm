@@ -1,4 +1,4 @@
-# Unidade grÃƒÂ¡fica 2x2
+# Unidade grÃƒÆ’Ã‚Â¡fica 2x2
 # Cenario 512x256
 #32768px ou 131
 
@@ -19,19 +19,19 @@
 .text
 # Registrador $21 esta reservado para localizacao do player
 # Registrador $22 esta reservado para localizacao do Drag1
-# Registrador $27 esta� reservado para guardar endereco de retorno apos chamada de funcoes sem o jal
-# Registrador $28 esta� reservada como controle de cenario
-# Registrador $29 esta� reservado como controle de movimento do Drag1
+# Registrador $27 esta¡ reservado para guardar endereco de retorno apos chamada de funcoes sem o jal
+# Registrador $28 esta¡ reservada como controle de cenario
+# Registrador $29 esta¡ reservado como controle de movimento do Drag1
 main:
 	jal test # Imagem do cenario 1 foi pixealizado com erro e alguma cores foram trocadas, essa funcao corrige a cores de pixels.
 	jal test1 # Cria uma demarcacao de cor 0xb1b1b1 para controlar a troca de cenario
 	jal backupNPCS
 	jal backup #Pinta o cenario 1 uma vez e salva uma copia do cenario 1 e 2, 32768 e 65536 bytes a frente do endereco 0x1001 respecticamente 
-	jal pintarF1 #Pinta o cenÃƒÆ’Ã‚Â¡rio da fase 1
+	jal pintarF1 #Pinta o cenÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio da fase 1
 	jal LocInicial # Inicia as cordenadas para pintar o player
 	jal LocInicialDrag1
 	jal pintarPlayer1
-	jal fiml #Entra no laco para manipulação das teclas lidas
+	jal fiml #Entra no laco para manipulaÃ§Ã£o das teclas lidas
 
 test1:
 	lui $20, 0x1001  
@@ -103,7 +103,7 @@ pintarFase:
 pintarF1:
 	lui $20, 0x1001 #Carrega o endereco base do display no registrador $20
 	addi $8, $0, 8192 #Carrega a quantidadede pixels queo video tem 256x128
-	addi $28, $0, 1 #controle de cenario / Registrador $28 armazena 1 quando está no cenario 1 e -1 quando está no 2
+	addi $28, $0, 1 #controle de cenario / Registrador $28 armazena 1 quando estÃ¡ no cenario 1 e -1 quando estÃ¡ no 2
 	j pintarF11
 
 pintarF11:
@@ -117,7 +117,7 @@ pintarF11:
 pintarF2:
 	lui $20, 0x1001 #Carrega o endereco base do display no registrador $20
 	addi $8, $0, 8192 #Carrega a quantidadede pixels queo video tem 256x128
-	addi $28, $0, -1 #controle de cenario / Registrador $28 armazena 1 quando está no cenario 1 e -1 quando está no 2
+	addi $28, $0, -1 #controle de cenario / Registrador $28 armazena 1 quando estÃ¡ no cenario 1 e -1 quando estÃ¡ no 2
 	j pintarF22
 
 pintarF22:
@@ -131,34 +131,34 @@ pintarF22:
 
 LocInicial:
 	lui $21, 0x1001
-	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã‚Â§o base (completa o endereÃƒÆ’Ã‚Â§o 0x10010000)
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base (completa o endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o 0x10010000)
 	addi $19, $0, 0x66F8  # Deslocamento total em hexadecimal
-        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã‚Â§o base, guardando o resultado em $20
+        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
 	j reset
 LocInicialF1:
 	lui $21, 0x1001
-	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã‚Â§o base (completa o endereÃƒÆ’Ã‚Â§o 0x10010000)
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base (completa o endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o 0x10010000)
 	addi $19, $0, 0x7B00  # Deslocamento total em hexadecimal
-        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã‚Â§o base, guardando o resultado em $20
+        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
 	j reset		
 LocIniciaF2:
 	lui $21, 0x1001
-	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã‚Â§o base (completa o endereÃƒÆ’Ã‚Â§o 0x10010000)
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base (completa o endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o 0x10010000)
 	addi $19, $0, 0x4F8  # Deslocamento total em hexadecimal
-        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã‚Â§o base, guardando o resultado em $20
+        addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
 	j reset
 LocInicialDrag1:
 	lui $22, 0x1001
 	ori $22, $22, 0x0000
 	addi $19, $0, 0x4A74  # Deslocamento 19060 bytes em hexadecimal
-        addu $22, $22, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã‚Â§o base, guardando o resultado em $20
+        addu $22, $22, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
         addi $29, $0, -1024
 	j reset
 		
 
 pintarPlayer1:
-	addi $8, $0, 3 #NÃƒÆ’Ã‚Âºmero de linhas do player
-	addi $9, $0, 2 #NÃƒÆ’Ã‚Âºmero de colunas do player
+	addi $8, $0, 3 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de linhas do player
+	addi $9, $0, 2 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de colunas do player
 	addi $25, $0, 0xffffff #adiciona cor branca ao registrador 25
 	add  $18, $21, $0
 	j pintarPlayerL
@@ -178,11 +178,56 @@ pintarPlayerL:
 	add $8, $8, -1
 	j pintarPlayerL
 
+pintarRastroPlayer1:
+	addi $8, $0, 3 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de linhas do player
+	addi $9, $0, 2 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de colunas do player
+	addi $25, $0, 0xaaaaaa #adiciona cor branca ao registrador 25
+	add  $18, $21, $0
+	j pintarRastroPlayerL
+
+pintarRastroPlayerC:
+	beq $9, $0, reset 
+	addi $19, $0, 500  # adiciona 126px 
+        addu $18, $18, $19   # desloca 126px ou 496 bytes a frente
+	addi $8, $0, 3 	
+	addi $9, $9, -1 # Decrementa o contador de colunas
+	j pintarRastroPlayerL
+	
+pintarRastroPlayerL:
+	beq $8, $0, pintarRastroPlayerC  
+	sw $25, 0($18)
+	addi $18, $18, 4
+	add $8, $8, -1
+	j pintarRastroPlayerL
+
+pintarRastroDrag1:
+	
+	add $18, $22, $0
+	addi $8, $0, 7 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de linhas do player
+	addi $9, $0, 14 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de colunas do player
+	j pintarRastroDrag1L
+
+pintarRastroDrag1C:
+	beq $9, $0, reset 
+	addi $19, $0, 484  # adiciona 126px 
+        addu $18, $18, $19   # desloca 126px ou 496 bytes a frente
+	addi $8, $0, 7 	
+	addi $9, $9, -1 # Decrementa o contador de colunas
+	j pintarRastroDrag1L
+	
+pintarRastroDrag1L:
+	beq $8, $0, pintarRastroDrag1C  
+	addi $4, $0, 0xaaaaaa
+	sw $4, 0($18)
+	addi $18, $18, 4
+	add $8, $8, -1
+	j pintarRastroDrag1L
+
 pintarDrag1:
 	lui $20, 0x1001
 	add $18, $22, $0
-	addi $8, $0, 7 #NÃƒÆ’Ã‚Âºmero de linhas do player
-	addi $9, $0, 14 #NÃƒÆ’Ã‚Âºmero de colunas do player
+	addi $8, $0, 7 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de linhas do player
+	addi $9, $0, 14 #NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de colunas do player
 	j pintarDrag1L
 
 pintarDrag1C:
@@ -209,7 +254,7 @@ movimentarDrag:
 movimentarDrag1:
 	add $22, $22, $29
 	jal CheckColisaoDragCenario
-	jal pintarFase
+	jal pintarRastroDrag1
 	jal pintarDrag1
 	jal pintarPlayer1
 	jr $27
@@ -236,25 +281,25 @@ ColisaoFase:
 	beq $28, -1, controleFase2
   
 controleFase1:
-	jal pintarF2
+	jal pintarF2 
 	jal pintarDrag1
 	jal LocIniciaF2
-	addi $20, $21, 0
+	
        	jal pintarPlayer1
-   	addi $21, $20, 0  
+   	 
 	j NaoDig  
 controleFase2:
 	jal pintarF1
 	jal LocInicialF1
-	addi $20, $21, 0
+	
        	jal pintarPlayer1
-       	addi $21, $20, 0  
+       	 
 	j NaoDig
 fiml:  
 	lui $21, 0x1001
-	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã‚Â§o base (completa o endereÃƒÆ’Ã‚Â§o 0x10010000)
+	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base (completa o endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o 0x10010000)
 	addi $19, $0, 0x66F8  # Deslocamento total em hexadecimal
-	addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã‚Â§o base, guardando o resultado em $20
+	addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
 	lui $26, 0xffff
         addi $11, $0, ' '
         addi $12, $0, 'a'
@@ -309,35 +354,33 @@ ColisaoCenario:
 	j reset
 	 
 DigA:  
-       addi $21, $21, -4 # decrementa 3 espaÃƒÂ§os de memoria do registrador que armazena um ponteiro para a posiÃƒÂ§ÃƒÂ£o inicia do personagem
+       jal pintarRastroPlayer1 #Pinta o cenario
+       addi $21, $21, -4 # decrementa 3 espaÃƒÆ’Ã‚Â§os de memoria do registrador que armazena um ponteiro para a posiÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o inicia do personagem
        addi $5, $0, +4 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
        jal pintarPlayer1
        j NaoDig                                                                      
  
 DigD:  
+       jal pintarRastroPlayer1 #Pinta o cenario
        addi $21, $21, 4
        addi $5, $0, -4 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
        jal pintarPlayer1
        j NaoDig        
 
 DigS:  
+       jal pintarRastroPlayer1 #Pinta o cenario
        addi $21, $21, +512
        addi $5, $0, -512 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
        jal pintarPlayer1
-       #add $22, $22, $29
-       #jal movimentarDrag
        j NaoDig      
 
 DigW:  
+       jal pintarRastroPlayer1 #Pinta o cenario
        addi $21, $21, -512
        addi $5, $0, +512 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
-       jal pintarFase #Pinta o cenario
        jal CheckColisaoCenario #Checa se ha alguma coisao
        jal pintarPlayer1
        j NaoDig                                                                                      
