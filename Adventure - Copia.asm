@@ -334,6 +334,7 @@ CheckColisaoCenario:
 	lw $4 0($21)
 	beq $4, 0xb1b1b1, ColisaoFase
 	bne $4, 0xaaaaaa, ColisaoCenario
+	bne $4, 0xaaaaaa, ColisaoPlayerDrag
 	
 	#Vertice 2 do player
 	lw $4 8($21)
