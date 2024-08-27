@@ -252,9 +252,10 @@ movimentarDrag:
 	beq $28, -1, movimentarDrag1
 	jr $27
 movimentarDrag1:
+	jal delay
+	jal pintarRastroDrag1
 	add $22, $22, $29
 	jal CheckColisaoDragCenario
-	jal pintarRastroDrag1
 	jal pintarDrag1
 	jal pintarPlayer1
 	jr $27
@@ -301,7 +302,6 @@ fiml:
 	addi $19, $0, 0x66F8  # Deslocamento total em hexadecimal
 	addu $21, $21, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
 	lui $26, 0xffff
-        addi $11, $0, ' '
         addi $12, $0, 'a'
         addi $13, $0, 's'
         addi $14, $0, 'd'
@@ -386,7 +386,14 @@ DigW:
        j NaoDig                                                                                      
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 NaoDig: j lacoP                                                      		
-						
+
+delay: addi $11, $0, 10000
+	j delay1
+delay1:
+	beq $11, 0, reset
+	addi $11, $11, -1
+	j delay1
+							
 reset: jr $31
 
 fimN: addi $2, $0, 10
