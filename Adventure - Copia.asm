@@ -24,51 +24,17 @@
 # Registrador $27 estaÂ¡ reservado para guardar endereco de retorno apos chamada de funcoes sem o jal
 # Registrador $28 estaÂ¡ reservada como controle de cenario
 # Registrador $29 estaÂ¡ reservado como controle de movimento do Drag1
+# Registrador $30 esta reservado para localizacao da Chave
 main:
-	#jal test # Imagem do cenario 1 foi pixealizado com erro e alguma cores foram trocadas, essa funcao corrige a cores de pixels.
-	#jal test1 # Cria uma demarcacao de cor 0xb1b1b1 para controlar a troca de cenario
+	
 	jal backupNPCS
 	jal backup #Pinta o cenario 1 uma vez e salva uma copia do cenario 1 e 2, 32768 e 65536 bytes a frente do endereco 0x1001 respecticamente 
 	jal pintarF1 #Pinta o cenÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡rio da fase 1
 	jal LocInicial # Inicia as cordenadas para pintar o player
 	jal LocInicialDrag1
+	jal LocInicialChave
 	jal pintarPlayer1
 	jal fiml #Entra no laco para manipulaÃƒÂ§ÃƒÂ£o das teclas lidas
-
-test1:
-	lui $20, 0x1001  
-	addi $26, $0, 0xb1b1b1
-	addi $20, $20, 32460
-	addi $8, $0, 26
-	j test1L
-
-test1L:
-	beq $8, $0, reset  
-	sw $26, 0($20)
-	addi $20, $20, 4
-	add $8, $8, -1
-	j testL
-
-test:
-	lui $20, 0x1001  
-	addi $26, $0, 0xaaaaaa
-	addi $20, $20, 25612
-	addi $8, $0, 122 
-	addi $9, $0, 11
-	j testL
-	
-testC:
-	beq $9, $0, reset 
-	addi $20, $20, 24   # desloca 126px ou 496 bytes a frente
-	addi $8, $0, 122 	
-	addi $9, $9, -1 # Decrementa o contador de colunas
-	j testL
-testL:
-	beq $8, $0, testC  
-	sw $26, 0($20)
-	addi $20, $20, 4
-	add $8, $8, -1
-	j testL
 	
 
 backupNPCS:
@@ -156,7 +122,13 @@ LocInicialDrag1:
         addu $22, $22, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
         addi $29, $0, -1024
 	j reset
-		
+	
+LocInicialChave:
+	lui $30, 0x1001
+	ori $30, $30, 0x0000
+	addi $19, $0, 0x6230  # Deslocamento 19060 bytes em hexadecimal
+        addu $30, $30, $19     # Adiciona o deslocamento ao endereÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o base, guardando o resultado em $20
+	j reset
 
 pintarPlayer1:
 	addi $8, $0, 3 #NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de linhas do player
@@ -224,6 +196,28 @@ pintarRastroDrag1L:
 	addi $18, $18, 4
 	add $8, $8, -1
 	j pintarRastroDrag1L
+
+pintarRastroChave:
+	add $18, $30, $0
+	addi $8, $0, 8 #NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de linhas do player
+	addi $9, $0, 2 #NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de colunas do player
+	j pintarRastroChaveL
+
+pintarRastroChaveC:
+	beq $9, $0, reset 
+	addi $19, $0, 480  # adiciona 126px 
+        addu $18, $18, $19   # desloca 126px ou 496 bytes a frente
+	addi $8, $0, 8 	
+	addi $9, $9, -1 # Decrementa o contador de colunas
+	j pintarRastroChaveL
+	
+pintarRastroChaveL:
+	beq $8, $0, pintarRastroChaveC  
+	addi $4, $0, 0xaaaaaa
+	sw $4, 0($18)
+	addi $18, $18, 4
+	add $8, $8, -1
+	j pintarRastroChaveL
 
 pintarDrag1:
 	lui $20, 0x1001
@@ -296,7 +290,31 @@ pintarDrag3L:
 	addi $18, $18, 4
 	add $8, $8, -1
 	j pintarDrag3L		
-			
+
+pintarChave:
+	lui $20, 0x1001
+	add $18, $30, $0
+	addi $8, $0, 8 #NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de linhas do player
+	addi $9, $0, 2 #NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de colunas do player
+	j pintarChaveL
+
+pintarChaveC:
+	beq $9, $0, reset 
+	addi $19, $0, 480  # adiciona 126px 
+        addu $18, $18, $19   # desloca 126px ou 496 bytes a frente
+	addi $8, $0, 8 	
+	addi $9, $9, -1 # Decrementa o contador de colunas
+	j pintarChaveL
+	
+pintarChaveL:
+	beq $8, $0, pintarChaveC  
+	lw $4, 99564($20)
+	sw $4, 0($18)
+	addi $20, $20, 4
+	addi $18, $18, 4
+	add $8, $8, -1
+	j pintarChaveL
+
 movimentarDrag:
 	addi $27, $31, 0
 	beq $28, -1, movimentarDrag1
@@ -345,11 +363,11 @@ CheckColisaoDragCenario:
 	
 	j reset
 ColisaoDragCenarioSuperior:
-	addi $29, $0, 1024
+	addi $29, $0, 512
 	add  $22, $22, $29 
 	j reset	
 ColisaoDragCenarioInferior:	
-	addi $29, $0, -1024
+	addi $29, $0, -512
 	add  $22, $22, $29 
 	j reset				
 							
@@ -361,17 +379,14 @@ controleFase1:
 	jal pintarF2 
 	jal pintarDrag1
 	jal LocIniciaF2
-	
-       	jal pintarPlayer1
-   	 
-	j NaoDig  
+	jal pintarPlayer1
+	jal pintarChave
+   	j NaoDig  
 controleFase2:
 	jal pintarF1
 	jal LocInicialF1
-	
-       	jal pintarPlayer1
-       	 
-	j NaoDig
+	jal pintarPlayer1
+       	j NaoDig
 fiml:  
 	lui $21, 0x1001
 	ori $21, $21, 0x0000  # Carrega a parte inferior do endereÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o base (completa o endereÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o 0x10010000)
@@ -416,6 +431,18 @@ ColisaoPlayerDrag2:
 	jal pintarDrag3
 	j fimN
 
+ColisaoPlayerChave:
+	addi $7, $0, 1
+	j movimentarChave
+
+movimentarChave:
+	lw $4, 0($21)
+	beq $4, 0x050505, pintarF2
+	jal pintarRastroChave
+	addi $30, $21, 2048
+	jal pintarChave
+	jal pintarPlayer1
+	j NaoDig
 posSegundoBeq:
        beq $10, $0, NaoDig      
        lw $16, 4($26)
@@ -446,12 +473,17 @@ CheckColisaoCenario:
 	beq $4, 0xa28738, ColisaoCenario
 	beq $4, 0xaeaeae, ColisaoPlayerDrag
 	beq $4, 0xfc0606, ColisaoPlayerDrag
+	beq $4, 0xafadad, ColisaoPlayerChave
+	beq $4, 0x010101, ColisaoPlayerChave
+	
 	
 	#Vertice 4 do player
 	lw $4 1032($21)
 	beq $4, 0xa28738, ColisaoCenario
 	beq $4, 0xaeaeae, ColisaoPlayerDrag
 	beq $4, 0xfc0606, ColisaoPlayerDrag
+	beq $4, 0xafadad, ColisaoPlayerChave
+	beq $4, 0x010101, ColisaoPlayerChave
 	
 	j reset
 	
@@ -464,6 +496,7 @@ DigA:
        addi $21, $21, -8 # decrementa 3 espaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§os de memoria do registrador que armazena um ponteiro para a posiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o inicia do personagem
        addi $5, $0, +8 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal CheckColisaoCenario #Checa se ha alguma coisao
+       beq $7, 1, movimentarChave
        jal pintarPlayer1
        j NaoDig                                                                      
  
@@ -472,24 +505,27 @@ DigD:
        addi $21, $21, 8
        addi $5, $0, -8 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal CheckColisaoCenario #Checa se ha alguma coisao
+       beq $7, 1, movimentarChave
        jal pintarPlayer1
-       j NaoDig        
+       j NaoDig                 
 
 DigS:  
        jal pintarRastroPlayer1 #Pinta o cenario
        addi $21, $21, +1024
        addi $5, $0, -1024 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal CheckColisaoCenario #Checa se ha alguma coisao
+       beq $7, 1, movimentarChave
        jal pintarPlayer1
-       j NaoDig      
+       j NaoDig               
 
 DigW:  
        jal pintarRastroPlayer1 #Pinta o cenario
        addi $21, $21, -1024
        addi $5, $0, +1024 # Passa o valor inverso a ser incrementado, caso a colisao seja verdadeira
        jal CheckColisaoCenario #Checa se ha alguma coisao
+       beq $7, 1, movimentarChave
        jal pintarPlayer1
-       j NaoDig                                                                                      
+       j NaoDig                                                                                    
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 NaoDig: j lacoP                                                      		
 
